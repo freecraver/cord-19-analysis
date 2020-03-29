@@ -2,7 +2,9 @@ from urllib.request import urlretrieve
 import os
 import tarfile
 import pysftp
+import json
 from glob import glob
+from pandas.io.json import json_normalize
 
 ALLEN_AI_RESOURCES = ['https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-20/comm_use_subset.tar.gz',
                       'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-20/noncomm_use_subset.tar.gz',
@@ -57,6 +59,17 @@ def unzip_resources(folder):
         tar.close()
 
 
+def merge_to_jsonl(folder, target_file):
+    json_list = []
+    for f in glob(folder + "/*.json"):
+        with open(f, "r") as infile:
+            # fixes invalid files before loading
+            json_list.append(json.loads("".join(infile.readlines()).replace("\n",""))['full-text-retrieval-response'])
+            # includes simple normalization
+
+    json_normalize(json_list).to_json(target_file, orient='records', lines=True)
+
+
 def download_all(base_dir=BASE_DIR):
     for res_folder, url_list in zip(['allenai'], [ALLEN_AI_RESOURCES]):
         target_folder = os.path.join(base_dir, res_folder)
@@ -67,3 +80,6 @@ def download_all(base_dir=BASE_DIR):
     for res_folder, sftp_con_info in (zip(['elsevier'], [ELSEVIER_SFTP])):
         target_folder = os.path.join(base_dir, res_folder)
         download_from_sftp(sftp_con_info['host'], sftp_con_info['user'], sftp_con_info['password'], target_folder)
+
+    # convert input format
+    merge_to_jsonl(os.path.join(base_dir, 'elsevier', 'meta'), os.path.join(base_dir, 'elsevier', 'meta.jsonl'))

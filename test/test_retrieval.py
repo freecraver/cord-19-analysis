@@ -18,7 +18,7 @@ class TestDatasetRetrieval(unittest.TestCase):
         # check elsevier
         elsevier_dir = os.path.join(mod_base_dir, 'elsevier')
         self.assertTrue(os.path.exists(elsevier_dir))
-        self.assertEqual(5, len(
+        self.assertEqual(6, len(
             [name for name in os.listdir(elsevier_dir) if os.path.isfile(os.path.join(elsevier_dir, name))]))
         self.assertEqual(1, len(
             [name for name in os.listdir(elsevier_dir) if os.path.isdir(os.path.join(elsevier_dir, name))]))
