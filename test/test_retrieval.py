@@ -22,3 +22,9 @@ class TestDatasetRetrieval(unittest.TestCase):
             [name for name in os.listdir(elsevier_dir) if os.path.isfile(os.path.join(elsevier_dir, name))]))
         self.assertEqual(1, len(
             [name for name in os.listdir(elsevier_dir) if os.path.isdir(os.path.join(elsevier_dir, name))]))
+
+        # check dimensions
+        dimensions_dir = os.path.join(mod_base_dir, 'dimensions')
+        self.assertTrue(os.path.exists(dimensions_dir))
+        self.assertEqual(1, len(
+            [name for name in os.listdir(dimensions_dir) if os.path.isfile(os.path.join(dimensions_dir, name))]))

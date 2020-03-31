@@ -13,6 +13,8 @@ ALLEN_AI_RESOURCES = ['https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaw
                       'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-20/metadata.csv',
                       'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-13/all_sources_metadata_2020-03-13.readme']
 
+DIMENSIONS_RESOURCES = ['https://docs.google.com/spreadsheets/d/1-kTZJZ1GAhJ2m4GAIhw1ZdlgO46JpvX0ZQa232VWRmw/export?format=csv&id=1-kTZJZ1GAhJ2m4GAIhw1ZdlgO46JpvX0ZQa232VWRmw&gid=1470772867']
+
 ELSEVIER_SFTP = {
     'host': 'coronacontent.np.elsst.com',
     'user': 'public',
@@ -27,7 +29,11 @@ def download_resources(urls, target_dir, verbose=True):
         os.makedirs(target_dir)
 
     for url in urls:
-        target_file_path = os.path.join(target_dir, url.split('/')[-1])
+        file_name = url.split('/')[-1]
+        if '?' in url:
+            file_suffix = '.csv' if 'csv' in file_name.split('?')[1] else ''
+            file_name = file_name.split('?')[0] + file_suffix # fix e.g. <url>/export?queryParam=23 -> <url>/export
+        target_file_path = os.path.join(target_dir, file_name)
         if verbose:
             print(f"Downloading from {url} to {target_file_path}")
         urlretrieve(url, target_file_path)
@@ -71,15 +77,19 @@ def merge_to_jsonl(folder, target_file):
 
 
 def download_all(base_dir=BASE_DIR):
-    for res_folder, url_list in zip(['allenai'], [ALLEN_AI_RESOURCES]):
+    for res_folder, url_list, perform_import in \
+            zip(['allenai', 'dimensions'], [ALLEN_AI_RESOURCES, DIMENSIONS_RESOURCES], [True, True]):
+        if not perform_import:
+            print("Skipping retrieval for", res_folder)
+            continue
         target_folder = os.path.join(base_dir, res_folder)
         print("Fetching files to " + target_folder)
         download_resources(url_list, target_folder)
         unzip_resources(target_folder)
 
-    for res_folder, sftp_con_info in (zip(['elsevier'], [ELSEVIER_SFTP])):
-        target_folder = os.path.join(base_dir, res_folder)
-        download_from_sftp(sftp_con_info['host'], sftp_con_info['user'], sftp_con_info['password'], target_folder)
-
-    # convert input format
-    merge_to_jsonl(os.path.join(base_dir, 'elsevier', 'meta'), os.path.join(base_dir, 'elsevier', 'meta.jsonl'))
+    # for res_folder, sftp_con_info in (zip(['elsevier'], [ELSEVIER_SFTP])):
+    #     target_folder = os.path.join(base_dir, res_folder)
+    #     download_from_sftp(sftp_con_info['host'], sftp_con_info['user'], sftp_con_info['password'], target_folder)
+    #
+    # # convert input format
+    # merge_to_jsonl(os.path.join(base_dir, 'elsevier', 'meta'), os.path.join(base_dir, 'elsevier', 'meta.jsonl'))
