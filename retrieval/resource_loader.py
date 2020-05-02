@@ -6,11 +6,11 @@ import json
 from glob import glob
 from pandas.io.json import json_normalize
 
-ALLEN_AI_RESOURCES = ['https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-20/comm_use_subset.tar.gz',
-                      'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-20/noncomm_use_subset.tar.gz',
-                      'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-20/custom_license.tar.gz',
-                      'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-20/biorxiv_medrxiv.tar.gz',
-                      'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-20/metadata.csv',
+ALLEN_AI_RESOURCES = ['https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/comm_use_subset.tar.gz',
+                      'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/noncomm_use_subset.tar.gz',
+                      'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/custom_license.tar.gz',
+                      'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/biorxiv_medrxiv.tar.gz',
+                      'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/latest/metadata.csv',
                       'https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/2020-03-13/all_sources_metadata_2020-03-13.readme']
 
 DIMENSIONS_RESOURCES = ['https://docs.google.com/spreadsheets/d/1-kTZJZ1GAhJ2m4GAIhw1ZdlgO46JpvX0ZQa232VWRmw/export?format=csv&id=1-kTZJZ1GAhJ2m4GAIhw1ZdlgO46JpvX0ZQa232VWRmw&gid=1470772867']
@@ -78,7 +78,7 @@ def merge_to_jsonl(folder, target_file):
 
 def download_all(base_dir=BASE_DIR):
     for res_folder, url_list, perform_import in \
-            zip(['allenai', 'dimensions'], [ALLEN_AI_RESOURCES, DIMENSIONS_RESOURCES], [True, True]):
+            zip(['allenai', 'dimensions'], [ALLEN_AI_RESOURCES, DIMENSIONS_RESOURCES], [True, False]):
         if not perform_import:
             print("Skipping retrieval for", res_folder)
             continue
